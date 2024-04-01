@@ -1,6 +1,7 @@
-    """Modify from the preprocess.py in PARIS
-    https://github.com/3dlg-hcvc/paris
-    """
+"""
+Modify from the preprocess.py in PARIS
+https://github.com/3dlg-hcvc/paris
+"""
 
 import pymeshlab
 import numpy as np
@@ -245,6 +246,19 @@ def generate_state(arti_info, meta, src_root, exp_dir, state, index):
                 ms.load_new_mesh(os.path.join(src_root, mesh_fname))
                 ms_static.load_new_mesh(os.path.join(src_root, mesh_fname))
 
+    # 3.5 save dynamic objects separately
+    output_dynamic = os.path.join(exp_dir, "dynamic_parts")
+    os.makedirs(output_dynamic, exist_ok=True)
+    # for mesh_index, _ in enumerate(ms_dynamic.mesh):
+    # for mesh_index in range(len(ms_dynamic.mesh)):
+    for mesh_index, mesh in enumerate(ms):
+        # current_mesh = mesh
+
+        output_file = os.path.join(output_dynamic, f"{index}_dynamic_{mesh_index}.obj")
+        ms.set_current_mesh(mesh_index)
+        ms.save_current_mesh(output_file)
+        # .save(output_file)
+
     # 4. Merge Filter: Flatten Visible Layers
     ms, ms_static, ms_dynamic = merge_meshsets([ms, ms_static, ms_dynamic])
 
@@ -360,7 +374,7 @@ if __name__ == "__main__":
     output_frames = 4
 
     # paths
-    src_root = os.path.join("paris_dataset", model_id)
+    src_root = os.path.join("./", model_id)
     dst_root = os.path.join(f"{category}", model_id_exp, "textured_objs")
 
     main(model_id, motions, output_frames, src_root, dst_root)

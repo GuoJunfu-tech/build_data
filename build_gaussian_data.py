@@ -6,7 +6,7 @@ import re
 from PIL import Image
 
 
-def unpack_zip_files(address):
+def unpack_zip_files(address, start_name):
     """
     Extracts the contents of ZIP files in a given address and creates new directories with the same names.
 
@@ -18,7 +18,7 @@ def unpack_zip_files(address):
     """
 
     for filename in os.listdir(address):
-        if filename.endswith(".zip"):
+        if filename.endswith(".zip") and filename.startswith(start_name):
             zip_filepath = os.path.join(address, filename)
             try:
                 # Create a directory with the same name as the ZIP file (without extension)
@@ -67,13 +67,15 @@ def rename_images(file_list, target_address):
                 image_counter += 1
 
 
-def generate_transform_json(file_list, target_address):
+def generate_transform_json(
+    file_list: list[str], target_address: str, test_or_train: str = "test"
+) -> None:
     sequence_number = 1
     time = 0
     # print(file_list, "\n", target_address)
     # time_steps = count_files_with_start_name(root_address, "dataset-") - 1
     time_steps = len(file_list) - 1
-    print(time_steps)
+    print(f"time_steps:{time_steps}")
     time_step = 1.0 / time_steps
 
     camera_angle_x, camera_angle_y = None, None
@@ -84,8 +86,7 @@ def generate_transform_json(file_list, target_address):
 
         print(f"processing file {filename}")
 
-        json_file = os.path.join(filename, "transforms_train.json")
-        print(json_file)
+        json_file = os.path.join(filename, f"transforms_train.json")
 
         with open(json_file, "r") as f:
             origin_data = json.load(f)
@@ -96,9 +97,10 @@ def generate_transform_json(file_list, target_address):
             for frame in origin_data["frames"]:
                 new_frame = dict()
                 new_frame["time"] = time
-                print(f"sequence_number: {sequence_number}")
-                file_path = f"./train/{(sequence_number):04d}"
-                print(f"file_path: {file_path}")
+                print(f"write time: {time}")
+                # print(f"sequence_number: {sequence_number}")
+                file_path = f"./{test_or_train}/{(sequence_number):04d}"
+                # print(f"file_path: {file_path}")
                 new_frame["file_path"] = file_path
                 new_frame["transform_matrix"] = frame["transform_matrix"]
 
@@ -112,7 +114,7 @@ def generate_transform_json(file_list, target_address):
     new_data["camera_angle_y"] = camera_angle_y
     new_data["frames"] = new_frames
 
-    output_json_file = os.path.join(target_address, "transforms_train.json")
+    output_json_file = os.path.join(target_address, f"transforms_{test_or_train}.json")
     with open(output_json_file, "w") as output_file:
         json.dump(new_data, output_file, indent=4)
 
@@ -178,9 +180,12 @@ def crop_image_and_lowen_resolution(image_path, output_path, resolution=(800, 80
 
 if __name__ == "__main__":
     # Replace 'path/to/your/directory' with the actual directory containing ZIP files
-    address = "/home/guojunfu/Documents/articulated_gaussian/fridge_2_40/"
-    # unpack_zip_files(address)
-    file_list = get_file_list_ref_to_the_end_number("dataset-", "", address)
-    target_address = os.path.join(address, "train")
+    address = "/home/guojunfu/Documents/articulated_gaussian/build_data/"
+    unpack_zip_files(address, start_name="test-")
+    file_list = get_file_list_ref_to_the_end_number("test-", "", address)
+
+    target_address = os.path.join(address, "test")
+    os.makedirs(target_address, exist_ok=True)
+
     rename_images(file_list, target_address)
-    generate_transform_json(file_list, address)
+    generate_transform_json(file_list, address, test_or_train="test")

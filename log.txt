@@ -1,0 +1,22 @@
+{
+    "BlenderNeRF Version": "5.0.0",
+    "Date and Time": "15/03/2024 21:01:50",
+    "Train": true,
+    "Test": true,
+    "AABB": 2,
+    "Render Frames": true,
+    "File Format": "NGP",
+    "Save Path": "/home/guojunfu/Documents/articulated_gaussian/build_data/",
+    "Method": "COS",
+    "Camera": "BlenderNeRF Camera",
+    "Location": "[0.0, 0.0, 0.0]",
+    "Rotation": "[0.0, 0.0, 0.0]",
+    "Scale": "[1.0, 1.0, 1.0]",
+    "Radius": 5.0,
+    "Lens": "79.0 mm",
+    "Seed": 4,
+    "Frames": 20,
+    "Upper Views": false,
+    "Outwards": false,
+    "Dataset Name": "test-0"
+}
